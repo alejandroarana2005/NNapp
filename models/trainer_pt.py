@@ -5,20 +5,21 @@ from .pytorch_arch import TabularNet
 from pathlib import Path
 
 def train_tabular(X_train, y_train, X_test, y_test, epochs=20):
-    dataset = TensorDataset(torch.tensor(X_train, dtype=torch.float32),
-                            torch.tensor(y_train, dtype=torch.float32))
+    dataset = TensorDataset(
+        torch.tensor(X_train, dtype=torch.float32),
+        torch.tensor(y_train, dtype=torch.float32)  # ← float32 correcto para BCELoss
+    )
     loader = DataLoader(dataset, batch_size=32, shuffle=True)
 
-    model = TabularNet(input_dim=X_train.shape[1])
-    # loss_fn = nn.BCELoss() # for binary classification with sigmoid
-    loss_fn = nn.CrossEntropyLoss() # for multi-class classification with softmax
+    model = TabularNet(input_dim=X_train.shape[1])  # ← 30 features automático
+    loss_fn = nn.BCELoss()   # ← CAMBIO: BCELoss para clasificación binaria
     opt = optim.Adam(model.parameters(), lr=1e-3)
 
     for ep in range(epochs):
         for xb, yb in loader:
             opt.zero_grad()
-            pred = model(xb).squeeze()
-            loss = loss_fn(pred, yb)
+            pred = model(xb).squeeze()  # ← squeeze: [batch,1] → [batch]
+            loss = loss_fn(pred, yb)    # ← pred y yb tienen misma forma
             loss.backward()
             opt.step()
 

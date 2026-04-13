@@ -16,38 +16,51 @@ import librosa
 # -----------------------------
 # Tabular
 # -----------------------------
-def preprocess_tabular(df: pd.DataFrame) -> [ np.ndarray | None]: # type: ignore
-    """
-    Limpia y normaliza un DataFrame.
-    Si el CSV de entrenamiento incluye una columna 'target', la separa.
-    Retorna (X, y) o (X, None) si no hay target.
-    """
-
+def preprocess_tabular(df: pd.DataFrame, target_column: str = None) -> tuple[np.ndarray, np.ndarray | None]:
     df = df.copy()
 
-    df = df.drop(columns="target", errors="ignore")
-    
-    # Normalización by Scaler
-    scaler = StandardScaler()
-    print(f"scalar values : {df.astype(np.float32)}")
-    X = scaler.fit_transform(df.astype(np.float32))
-    
-    
-    return X
+    # Separar y antes de limpiar X
+    y = None
+    if target_column and target_column in df.columns:
+        y = df[target_column].values
+        df = df.drop(columns=[target_column])
 
+    # Limpiar columnas con strings numéricos mal formateados
+    for col in df.columns:
+        if df[col].dtype == object:
+            df[col] = (
+                df[col]
+                .str.replace('.', '', regex=False)  # quitar puntos de miles
+                .str.replace(',', '.', regex=False) # coma decimal a punto
+            )
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    df = df.fillna(0)
+
+    scaler = StandardScaler()
+    X = scaler.fit_transform(df.astype(np.float32))
+
+    return X, y
 # -----------------------------
-# Imágenes
-# -----------------------------
-def preprocess_image(file_bytes: bytes, size: Tuple[int, int] = (128, 128)) -> np.ndarray:
-    """
-    Abre una imagen, la convierte a RGB, la redimensiona y normaliza a [0,1].
-    Retorna un array (H, W, 3).
-    """
+def preprocess_image(file_bytes: bytes, framework: str = "pytorch", model_name: str = "cnn") -> np.ndarray:
+    # CAMBIO: tamaño según modelo
+    size = (224, 224) if model_name == "resnet" else (128, 128)
+
     img = Image.open(io.BytesIO(file_bytes)).convert("RGB")
     img = img.resize(size)
     arr = np.array(img).astype("float32") / 255.0
-    return arr
 
+    mean = np.array([0.485, 0.456, 0.406])
+    std  = np.array([0.229, 0.224, 0.225])
+    arr  = (arr - mean) / std
+
+    if framework == "pytorch":
+        arr = arr.transpose(2, 0, 1)
+        arr = arr[np.newaxis, ...]
+    else:
+        arr = arr[np.newaxis, ...]
+
+    return arr.astype("float32")
 
 # -----------------------------
 # Audio
