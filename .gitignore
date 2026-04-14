@@ -1,15 +1,46 @@
+# Entorno virtual
 .venv/
 .venv
+
+# Cache de Python
 __pycache__/
 *.pyc
+*.pyo
+
+# Sistema operativo
 .DS_Store
 .vscode/
 .idea/
+
+# Variables de entorno
 .env
 .env.*
+
+# Logs
 *.log
+
+# Carpetas de salida
 output/
 output-*/
+
+# Uploads temporales
 uploads/
 uploads-*/
+
+# Datasets e imágenes (pesan demasiado)
+datasets/
 datasets-*/
+
+# Modelos entrenados (se pueden regenerar con los scripts)
+models/saved/
+
+# Cache de Kaggle
+.cache/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Archivos de distribución Python
+*.egg-info/
+dist/
+build/
