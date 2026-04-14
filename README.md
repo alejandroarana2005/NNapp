@@ -1,8 +1,6 @@
 # INTEGRANTES: ALEJANDRO ARANA FERNADEZ 2220232039
 
-# Install the viraual environment
-> python -m venv .venv
-# versión compatible con tensor
+# Instalar ambiente virtual con la versión  de python compatible con tensor
 > py -3.12 -m venv .venv 
 
 # Activate the venv in Windows
@@ -20,7 +18,7 @@
 # abre otro terminal y ejecutas el frontned
 > streamlit run ui/app.py
 
-# notas
+# nota
 Los entrenamientos se hicieron a través de los archivos localizados en NNapp\Scripts
 
 # resultados
@@ -28,3 +26,5 @@ Los entrenamientos se hicieron a través de los archivos localizados en NNapp\Sc
 CNN 32X32  ------- 64% de precisión
 CNN 124x124 ------------ 78% de precision
 Transfer Learning ResNet 224x224 ---------------- 95.4% de precisión
+
+#
